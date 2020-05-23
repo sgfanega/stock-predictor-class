@@ -115,13 +115,3 @@ class StockPredictor:
 
         self.confidence = svr.score(x_test, y_test)
         self.predictions = svr.predict(x_forecast)
-
-
-# ts = input("What stock do you want predicted?: ")
-# fd = input("How many days in the future do you want to predict?: ")
-mlt = input("What type of Machine Learning do you want to use? LR or SVM?: ")
-if mlt != "LR":
-    print("It's not LR")
-# sp = StockPredictor(ts, int(fd), mlt)
-# print(sp.get_confidence())
-# print(sp.get_prediction())
