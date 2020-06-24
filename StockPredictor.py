@@ -102,6 +102,7 @@ class StockPredictor:
 
         return x_forecast
 
+    # Linear Regression Method
     def __linear_regression_process(self, x_train, x_test, y_train, y_test, x_forecast):
         lr = LinearRegression()
         lr.fit(x_train, y_train)
@@ -109,6 +110,7 @@ class StockPredictor:
         self.confidence = lr.score(x_test, y_test)
         self.predictions = lr.predict(x_forecast)
 
+    # Support Vector Machine Method
     def __support_vector_machine_process(self, x_train, x_test, y_train, y_test, x_forecast):
         svr = SVR(kernel='rbf', C=1e3, gamma=0.1)
         svr.fit(x_train, y_train)
