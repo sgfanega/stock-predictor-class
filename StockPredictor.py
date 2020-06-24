@@ -48,7 +48,6 @@ class StockPredictor:
 
     # Start Method
     def start_process(self):
-        print(self.__get_machine_learning_type())
         # Throws Error if the Machine Learning Type is not LR or SVM
         if self.__get_machine_learning_type() is not 'LR' and self.__get_machine_learning_type() is not 'SVM':
             raise ValueError("Machine Learning Type must be either LR or SVM")
