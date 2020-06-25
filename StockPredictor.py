@@ -8,6 +8,7 @@ from sklearn import preprocessing
 import yfinance as yf
 import numpy as np
 import pandas as pd
+import sys
 pd.options.mode.chained_assignment = None
 
 
@@ -46,13 +47,25 @@ class StockPredictor:
     def get_prediction(self):
         return self.predictions
 
+    # Get Method
+    # Return JSON
+    def get_json(self):
+        json = {"confidence": self.get_confidence()}
+        day_index = 1
+
+        for prediction in self.get_prediction():
+            json["{} {}".format("day", day_index)] = prediction
+            day_index += 1
+
+        return json
+
     # Start Method
     def start_process(self):
         # Throws Error if the Machine Learning Type is not LR or SVM
-        if self.__get_machine_learning_type() is not 'LR' and self.__get_machine_learning_type() is not 'SVM':
+        if self.__get_machine_learning_type() != 'LR' and self.__get_machine_learning_type() != 'SVM':
             raise ValueError("Machine Learning Type must be either LR or SVM")
         # Throws Error if Forecast Days is not an int
-        if type(self.__get_forecast_days()) is not int:
+        if type(self.__get_forecast_days()) != int:
             raise ValueError("Forecast Days is not a valid amount")
 
         data = self.__get_data()  # Original Data
@@ -63,10 +76,10 @@ class StockPredictor:
 
         x_forecast = self.__get_independent_forecast(data)
 
-        if self.__get_machine_learning_type() is 'LR':
-            self.__linear_regression_process( x_train, x_test, y_train, y_test, x_forecast)
+        if self.__get_machine_learning_type() == 'LR':
+            self.__linear_regression_process(x_train, x_test, y_train, y_test, x_forecast)
         else:
-            self.__support_vector_machine_process( x_train, x_test, y_train, y_test, x_forecast)
+            self.__support_vector_machine_process(x_train, x_test, y_train, y_test, x_forecast)
 
     # Get Method
     # Return 2D List
@@ -74,14 +87,12 @@ class StockPredictor:
         data = yf.download(self.__get_ticker_symbol())
         data = data[['Adj Close']]  # Discard everything but the Adj Close Column
         data['Prediction'] = data[['Adj Close']].shift(-self.__get_forecast_days())  # Shift the data N up
-
         return data
 
     # Get Method
     # Return 2D List
     def __get_independent_set(self, data):
         x = np.array(data.drop(['Prediction'], 1))  # Creates a numpy array without 'Prediction'
-        x = preprocessing.scale(x)  # Standardizes the data set, not sure if needed
         x = x[:-self.__get_forecast_days()]  # Removes the last N rows
 
         return x
@@ -116,3 +127,18 @@ class StockPredictor:
 
         self.confidence = svr.score(x_test, y_test)
         self.predictions = svr.predict(x_forecast)
+
+
+# Get Method
+# Retrieves JSON
+def get_json(ticker_symbol, forecast_days, machine_learning_type):
+    stock_predictor = StockPredictor(ticker_symbol, forecast_days, machine_learning_type)
+
+    return stock_predictor.get_json()
+
+
+if __name__ == '__main__':
+    if np.size(sys.argv) != 4:
+        raise ValueError('The amount of parameters are {}, you need 4 in total'.format(np.size(sys.argv)))
+
+    get_json(sys.argv[1], int(sys.argv[2]), sys.argv[3])
