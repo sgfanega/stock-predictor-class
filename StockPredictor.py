@@ -2,13 +2,13 @@
 from sklearn.linear_model import LinearRegression
 from sklearn.svm import SVR
 from sklearn.model_selection import train_test_split
-from sklearn import preprocessing
 
 # Dependencies
 import yfinance as yf
 import numpy as np
 import pandas as pd
 import sys
+import simplejson as json
 pd.options.mode.chained_assignment = None
 
 
@@ -141,4 +141,4 @@ if __name__ == '__main__':
     if np.size(sys.argv) != 4:
         raise ValueError('The amount of parameters are {}, you need 4 in total'.format(np.size(sys.argv)))
 
-    get_json(sys.argv[1], int(sys.argv[2]), sys.argv[3])
+    print(json.dumps(get_json(sys.argv[1], int(sys.argv[2]), sys.argv[3])))
