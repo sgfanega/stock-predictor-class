@@ -15,7 +15,7 @@ pd.options.mode.chained_assignment = None
 class StockPredictor:
     # Constructor
     def __init__(self, ticker_symbol, forecast_days=10, machine_learning_type="LR"):
-        self.ticker_symbol = ticker_symbol
+        self.ticker_symbol = `ticker_symbol
         self.forecast_days = forecast_days
         self.machine_learning_type = machine_learning_type
         self.confidence = ""
@@ -23,49 +23,24 @@ class StockPredictor:
         self.start_process()
 
     # Get Method
-    # Return String
-    def __get_ticker_symbol(self):
-        return self.ticker_symbol
-
-    # Get Method
-    # Return int
-    def __get_forecast_days(self):
-        return self.forecast_days
-
-    # Get Method
-    # Return String
-    def __get_machine_learning_type(self):
-        return self.machine_learning_type
-
-    # Get Method
-    # Return float
-    def get_confidence(self):
-        return self.confidence
-
-    # Get Method
-    # Return List
-    def get_prediction(self):
-        return self.predictions
-
-    # Get Method
     # Return JSON
     def get_json(self):
-        json = {"confidence": self.get_confidence()}
+        json_output = {"confidence": self.confidence}
         day_index = 1
 
-        for prediction in self.get_prediction():
-            json["{} {}".format("day", day_index)] = prediction
+        for prediction in self.predictions:
+            json_output["{} {}".format("day", day_index)] = prediction
             day_index += 1
 
-        return json
+        return json_output
 
     # Start Method
     def start_process(self):
         # Throws Error if the Machine Learning Type is not LR or SVM
-        if self.__get_machine_learning_type() != 'LR' and self.__get_machine_learning_type() != 'SVM':
+        if self.machine_learning_type != 'LR' and self.machine_learning_type != 'SVM':
             raise ValueError("Machine Learning Type must be either LR or SVM")
         # Throws Error if Forecast Days is not an int
-        if type(self.__get_forecast_days()) != int:
+        if type(self.forecast_days) != int:
             raise ValueError("Forecast Days is not a valid amount")
 
         data = self.__get_data()  # Original Data
@@ -76,7 +51,7 @@ class StockPredictor:
 
         x_forecast = self.__get_independent_forecast(data)
 
-        if self.__get_machine_learning_type() == 'LR':
+        if self.machine_learning_type == 'LR':
             self.__linear_regression_process(x_train, x_test, y_train, y_test, x_forecast)
         else:
             self.__support_vector_machine_process(x_train, x_test, y_train, y_test, x_forecast)
@@ -84,32 +59,30 @@ class StockPredictor:
     # Get Method
     # Return 2D List
     def __get_data(self):
-        data = yf.download(self.__get_ticker_symbol())
+        data = yf.download(self.ticker_symbol)
         data = data[['Adj Close']]  # Discard everything but the Adj Close Column
-        data['Prediction'] = data[['Adj Close']].shift(-self.__get_forecast_days())  # Shift the data N up
+        data['Prediction'] = data[['Adj Close']].shift(-self.forecast_days)  # Shift the data N up
+
         return data
 
     # Get Method
     # Return 2D List
     def __get_independent_set(self, data):
         x = np.array(data.drop(['Prediction'], 1))  # Creates a numpy array without 'Prediction'
-        x = x[:-self.__get_forecast_days()]  # Removes the last N rows
-
+        x = x[:-self.forecast_days]  # Removes the last N rows
         return x
 
     # Get Method
     # Return List
     def __get_dependent_set(self, data):
         y = np.array(data['Prediction'])  # Creates a numpy array just of 'Prediction'
-        y = y[:-self.__get_forecast_days()]  # Removes the last N rows
-
+        y = y[:-self.forecast_days]  # Removes the last N rows
         return y
 
     # Get Method
     # Return List
     def __get_independent_forecast(self, data):
-        x_forecast = np.array(data.drop(['Prediction'], 1))[-self.__get_forecast_days():]
-
+        x_forecast = np.array(data.drop(['Prediction'], 1))[-self.forecast_days:]
         return x_forecast
 
     # Linear Regression Method
