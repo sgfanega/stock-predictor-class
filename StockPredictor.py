@@ -15,7 +15,7 @@ pd.options.mode.chained_assignment = None
 class StockPredictor:
     # Constructor
     def __init__(self, ticker_symbol, forecast_days=10, machine_learning_type="LR"):
-        self.ticker_symbol = `ticker_symbol
+        self.ticker_symbol = ticker_symbol
         self.forecast_days = forecast_days
         self.machine_learning_type = machine_learning_type
         self.confidence = ""
