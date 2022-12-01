@@ -25,15 +25,20 @@ class StockPredictor:
     
     def get_json(self):
         # Gets confidence and predictions and formats it into a JSON
-        json = {}
+        json_data = {
+            'ticker_symbol': '',
+            'confidence': '',
+            'predictions': {},
+        }
+
+        json_data['ticker_symbol'] = self.ticker_symbol
+        json_data['confidence'] = self.confidence
 
         day_index = 1
 
         for prediction in self.predictions:
-            json["{} {}".format("Day", day_index)] = prediction
+            json_data['predictions']['{} {}'.format('day', day_index)] = prediction
             day_index += 1
-
-        json['Confidence'] = self.confidence
 
         return json
     
@@ -65,7 +70,7 @@ class StockPredictor:
         # Gets the data from Yahoo! Finance. Will return an error if the Ticker Symbol is non-NYSE
         # Return 2D List
         try:
-            data = yf.download(self.ticker_symbol)
+            data = yf.download(self.ticker_symbol, progress=False)
             data = data[['Adj Close']]
             data['Prediction'] = data[['Adj Close']].shift(-self.prediction_days)
 
@@ -76,7 +81,7 @@ class StockPredictor:
     def __get_independent_set(self, data):
         # Gets Independent Set from Data retrieved from Yahoo! Finance
         # Return 2D List
-        x = np.array(data.drop(['Prediction'], 1)) # Creates a numpy array without 'Prediction'
+        x = np.array(data.drop(columns=['Prediction'])) # Creates a numpy array without 'Prediction'
         x = x[:-self.prediction_days] # Removes the last N rows
         
         return x
@@ -92,7 +97,7 @@ class StockPredictor:
     def __get_independent_forecast(self, data):
         # Gets Independent Forecast from Data retrieved from Yahoo! Finance
         # Return List
-        x_forecast = np.array(data.drop(['Prediction'], 1))[-self.prediction_days:]
+        x_forecast = np.array(data.drop(columns=['Prediction']))[-self.prediction_days:]
         
         return x_forecast
     
